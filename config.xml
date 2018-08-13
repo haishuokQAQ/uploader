@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <!-- 对端传输的基础目录 -->
+   <base_dir>test/aaa</base_dir>
+   <not_match_dir>test/bbb</not_match_dir>
+   <!-- FTP域名 -->
+   <ftp_host>192.168.0.5</ftp_host>
+   <!-- FTP端口 -->
+   <ftp_port>21</ftp_port>
+   <!-- FTP用户名 -->
+   <ftp_username>ftpuser</ftp_username>
+   <!-- FTP密码 -->
+   <ftp_password>111111</ftp_password>
+   <!-- 扫描的主目录 -->
+   <scan_dir>test</scan_dir>
+   <!-- 上传线程数 -->
+   <thread>1</thread>
+   <!-- 上传后是否删除(建议测试后改为true) -->
+   <delete>true</delete>
+   <!-- 模式，目前可选为0和1（0代表5分钟一批批量上传，1代表实时上传-->
+   <mode>1</mode>
+   <!-- 实时上传模式下，文件超时时间，单位秒(s) -->
+   <scan_interval>5</scan_interval>
+</root>
