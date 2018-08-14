@@ -84,20 +84,21 @@ public class UpdateThread extends Thread{
 	public void run() {
 		File tempFile = null;
 		while (true){
-			if (!connected){
+			if (!ftpConn.isConnected()){
 				connect();
 				continue;
 			}
 			try {
 				tempFile = uploadQueue.take();
+				if (!tempFile.exists()) continue;
 				String path = baseDir + "/" + PathManager.getTimeBaseString();
-				ftpConn.uploadFile(path, tempFile.getName(), tempFile);
+				boolean updated = ftpConn.uploadFile(path, tempFile.getName(), tempFile);
 				String tableName = splitTableName(tempFile.getAbsolutePath());
 				RuntimeStatus.updateTableUpload(tableName, 1);
-				if (dt != null ){
-					if ((ConfigContainer.extraMode && be) || !ConfigContainer.extraMode) {
+				if (dt != null && updated ){
+					//if ((ConfigContainer.extraMode && be) || !ConfigContainer.extraMode) {
 						dt.insert(tempFile);
-					}
+					//}
  				}
 			}catch(Exception e){
 				logger.error("Fail to update file because {}", e.toString());

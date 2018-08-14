@@ -28,6 +28,7 @@ public class FTPConnector implements Connector {
 		try{
 			ftpClient.connect(host, port);
 			ftpClient.login(userName, password);
+			//ftpClient.setDataTimeout(300000);
 			int replyCode = ftpClient.getReplyCode();
 			if (!FTPReply.isPositiveCompletion(replyCode)) return false;
 			connected = true;
@@ -48,6 +49,7 @@ public class FTPConnector implements Connector {
 			File sourceFileNew = new File(sourceFile.getAbsolutePath());
 			if (sourceFileNew.length() == 0) {
 				logger.error("Find file {} witch is empty", sourceFileNew.getAbsolutePath());
+				return false;
 			}
 			bis = new BufferedInputStream(new FileInputStream(sourceFileNew));
 			ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -57,10 +59,9 @@ public class FTPConnector implements Connector {
 			boolean sent = ftpClient.storeFile(fileTempName, bis);
 			if (!sent) {
 				logger.error("Fail send file {}.", fileName);
+				ftpClient.deleteFile(fileTempName);
+				return false;
 			}else {
-				if (existFile(getWrongFileName(fileTempName))) {
-					logger.info("Find wrong fileName {}.", getWrongFileName(fileTempName));
-				}
 				boolean rename = ftpClient.rename(fileTempName, getFileZipName(fileTempName));
 				if (rename) {
 					if (existFile(getWrongFileName(getFileZipName(fileTempName)))) {
@@ -76,9 +77,11 @@ public class FTPConnector implements Connector {
 			
 			for (int i = 0; i < pathName.split("/").length; i++)
 				ftpClient.changeToParentDirectory();
+			FTPStatistic.addUpdate();
 			return true;
 		}catch(Exception e){
 			logger.error("Fail to update file {}.Because {}.", sourceFile, e.toString());
+			connected = false;
 			return false;
 		}
 	}
@@ -151,6 +154,9 @@ public class FTPConnector implements Connector {
 		return result;
 	}
 	
+	public boolean isConnected() {
+		return connected;
+	}
 	
 	public static String getFileZipName(String fileName){
 		String[] names = fileName.split("\\.");

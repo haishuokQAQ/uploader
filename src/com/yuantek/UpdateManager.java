@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.yuantek.ftp.UpdateThread;
+import com.yuantek.util.RuntimeStatus;
 
 public class UpdateManager {
 	private static UpdateManager instance = new UpdateManager();
@@ -22,19 +23,22 @@ public class UpdateManager {
 	private UpdateManager() {
 		for (int i = 0; i < ConfigContainer.thread; i++){
 			UpdateThread ut = new UpdateThread(ConfigContainer.hostName, ConfigContainer.port, ConfigContainer.userName, ConfigContainer.password, i, true);
+			RuntimeStatus.updateThread(ut, true);
 			extraThreads.add(ut);
 			ut.start();
 		}
-		if (ConfigContainer.extraMode) {
+		
+		/*if (ConfigContainer.extraMode) {
 			for (int i = 0; i < ConfigContainer.thread; i++){
 				UpdateThread ut = new UpdateThread(ConfigContainer.hostName, ConfigContainer.port, ConfigContainer.userName, ConfigContainer.password, i, ConfigContainer.postName);
 				threads.add(ut);
 				ut.start();
 			}
-		}
+		}*/
 		for (int i = 0; i < ConfigContainer.thread; i++){
 			UpdateThread ut = new UpdateThread(ConfigContainer.hostName, ConfigContainer.port, ConfigContainer.userName, ConfigContainer.password, i + 2, false);
 			notMatchThreads.add(ut);
+			RuntimeStatus.updateThread(ut, false);
 			ut.start();
 		}
 	}
